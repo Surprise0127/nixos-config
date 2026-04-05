@@ -28,12 +28,16 @@
   # 时区设置
   time.timeZone = "Asia/Shanghai"; # 设置时区为上海
 
-  # 使用国内源
-  nix.settings.substituters = [
-    "https://mirrors.ustc.edu.cn/nix-channels/store?priority=10"
-    "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store?priority=5"
-    "https://cache.nixos.org/"
-  ];
+  # 使用国内源加速 Nix 包管理器  
+  nix.settings = {
+    extra-substituters = [
+      "https://mirrors.ustc.edu.cn/nix-channels/store?priority=10"
+      "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store?priority=5"
+      "https://noctalia.cachix.org"
+      "https://cache.nixos.org/"
+    ];
+    extra-trusted-public-keys = [ "noctalia.cachix.org-1:pCOR47nnMEo5thcxNDtzWpOxNFQsBRglJzxWPp3dkU4=" ]; # 添加 noctalia.cachix.org 的公钥，允许从该源下载包
+};
 
   # 语言和国际化
   i18n.defaultLocale = "en_US.UTF-8"; # 设置默认语言为英语
@@ -49,12 +53,48 @@
     LC_TIME = "zh_CN.UTF-8"; # 设置时间格式为中文
   };
 
+  # 输入法：启用 Fcitx5（中文）
+  i18n.inputMethod = {
+    enabled = "fcitx5";
+    fcitx5.addons = with pkgs; [
+      fcitx5-chinese-addons
+      fcitx5-gtk
+    ];
+  };
+
+  # 字体：通用 + 中文 + Emoji
+  fonts.packages = with pkgs; [
+    noto-fonts
+    noto-fonts-cjk-sans
+    noto-fonts-cjk-serif
+    nerd-fonts.jetbrains-mono
+  ];
+
 
   # 系统基础软件包
   environment.systemPackages = with pkgs; [
     vim 
     git
+    alacritty
+    fuzzel
+    firefox
+    fcitx5-configtool
   ];
+
+  # 启用 Niri（Wayland 合成器）
+  programs.niri.enable = true;
+  programs.niri.useNautilus = false; # 用 GTK 文件选择器，避免强依赖 Nautilus
+
+  # 使用 greetd 作为登录管理器，并启动 Niri 会话
+  services.greetd = {
+    enable = true;
+    settings = {
+      default_session = {
+        command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --remember --cmd ${config.programs.niri.package}/bin/niri-session";
+        user = "greeter";
+      };
+    };
+  };
 
 
   # SSH 服务设置
@@ -76,6 +116,12 @@
     pulse.enable = true; # 启用 PulseAudio 兼容层
   };
 
+  # 蓝牙支持设置
+  hardware.bluetooth.enable = true; # 启用蓝牙支持
+
+  # 电源管理设置
+  services.power-profiles-daemon.enable = true; # 启用电源配置守护程序，提供性能和节能模式
+  services.upower.enable = true; # 启用电源管理服务，监控电池状态和电源事件
 
   # 系统状态版本
   system.stateVersion = "25.11";
