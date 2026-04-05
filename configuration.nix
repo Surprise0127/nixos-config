@@ -20,6 +20,14 @@
   # 网络管理
   networking.networkmanager.enable = true; # 启用 NetworkManager
 
+  # 用户设置（Home Manager 目标用户）
+  users.groups.drfoobar = { };
+  users.users.drfoobar = {
+    isNormalUser = true;
+    group = "drfoobar";
+    extraGroups = [ "wheel" "networkmanager" ];
+  };
+
   # 启用实验性特性（flakes 等）
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   nix.settings.accept-flake-config = true; # 自动接受 flake 的 nixConfig
@@ -31,10 +39,11 @@
   # 使用国内源加速 Nix 包管理器  
   nix.settings = {
     extra-substituters = [
-      "https://mirrors.ustc.edu.cn/nix-channels/store?priority=10"
-      "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store?priority=5"
+      "https://cache.nixos.org"
       "https://noctalia.cachix.org"
-      "https://cache.nixos.org/"
+      # 国内镜像偶发 DNS/连接超时，按需手动开启：
+      # "https://mirrors.ustc.edu.cn/nix-channels/store"
+      # "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store"
     ];
     extra-trusted-public-keys = [ "noctalia.cachix.org-1:pCOR47nnMEo5thcxNDtzWpOxNFQsBRglJzxWPp3dkU4=" ]; # 添加 noctalia.cachix.org 的公钥，允许从该源下载包
 };
@@ -55,9 +64,10 @@
 
   # 输入法：启用 Fcitx5（中文）
   i18n.inputMethod = {
-    enabled = "fcitx5";
+    enable = true;
+    type = "fcitx5";
     fcitx5.addons = with pkgs; [
-      fcitx5-chinese-addons
+      qt6Packages.fcitx5-chinese-addons
       fcitx5-gtk
     ];
   };
@@ -78,7 +88,7 @@
     alacritty
     fuzzel
     firefox
-    fcitx5-configtool
+    qt6Packages.fcitx5-configtool
   ];
 
   # 启用 Niri（Wayland 合成器）
@@ -88,12 +98,19 @@
   # 使用 greetd 作为登录管理器，并启动 Niri 会话
   services.greetd = {
     enable = true;
+    useTextGreeter = true;
     settings = {
       default_session = {
-        command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --remember --cmd ${config.programs.niri.package}/bin/niri-session";
+        command = "${pkgs.tuigreet}/bin/tuigreet --time --remember --cmd ${config.programs.niri.package}/bin/niri-session";
         user = "greeter";
       };
     };
+  };
+
+  # 自定义用户
+  users.users.kd = {
+    isNormalUser = true;
+    extraGroups = [ "wheel" "networkmanager" ];
   };
 
 

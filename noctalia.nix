@@ -5,6 +5,8 @@
       inputs.noctalia.homeModules.default
     ];
 
+    home.stateVersion = "25.11";
+
     xdg.configFile."autostart/noctalia-shell.desktop".text = ''
       [Desktop Entry]
       Type=Application
