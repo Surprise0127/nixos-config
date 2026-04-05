@@ -22,6 +22,8 @@
 
   # 启用实验性特性（flakes 等）
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nix.settings.accept-flake-config = true; # 自动接受 flake 的 nixConfig
+  nix.channel.enable = false; # 关闭 channel，避免和 flakes 混用
 
   # 时区设置
   time.timeZone = "Asia/Shanghai"; # 设置时区为上海
