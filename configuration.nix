@@ -92,6 +92,11 @@
   # 蓝牙支持设置
   hardware.bluetooth.enable = true; # 启用蓝牙支持
 
+  # Home Manager 配置
+  home-manager.users.kd = {
+    home.stateVersion = "25.11";
+  };
+
   # 电源管理设置
   services.power-profiles-daemon.enable = true; # 启用电源配置守护程序，提供性能和节能模式
   services.upower.enable = true; # 启用电源管理服务，监控电池状态和电源事件
