@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, inputs, ... }:
 {
   # 启用 Niri（Wayland 合成器）
   programs.niri.enable = true;
@@ -20,15 +20,27 @@
   home-manager.users.drfoobar = {
     home.stateVersion = "25.11";
 
-    programs.niri = {
+    # 导入官方模块：Noctalia HM + niri-flake HM config
+    imports = [
+      inputs.noctalia.homeModules.default
+      inputs.niri.homeModules.config
+    ];
+
+    programs.noctalia-shell = {
       enable = true;
-      settings = {
-        spawn-at-startup = [
-          {
-            command = [ "noctalia-shell" ];
-          }
-        ];
-      };
+      # 官方文档说明已不推荐 systemd startup，优先由合成器/自动启动拉起
+      systemd.enable = false;
+    };
+
+    # Noctalia 官方推荐：由 Niri 的 spawn-at-startup 启动
+    programs.niri = {
+      # 让 niri-flake 的配置校验使用和系统一致的 niri 包
+      package = config.programs.niri.package;
+      settings.spawn-at-startup = [
+        {
+          command = [ "noctalia-shell" ];
+        }
+      ];
     };
   };
 }
