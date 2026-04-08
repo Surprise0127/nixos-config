@@ -31,6 +31,13 @@
     extraGroups = [ "wheel" "networkmanager" ];
   };
 
+  users.groups.kd = { };
+  users.users.kd = {
+    isNormalUser = true;
+    group = "kd";
+    extraGroups = [ "wheel" "networkmanager" ];
+  };
+
   # 启用实验性特性（flakes 等）
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   nix.settings.accept-flake-config = true; # 自动接受 flake 的 nixConfig
@@ -61,12 +68,6 @@
     vscode
     qt6Packages.fcitx5-configtool
   ];
-
-  # 自定义用户
-  users.users.kd = {
-    isNormalUser = true;
-    extraGroups = [ "wheel" "networkmanager" ];
-  };
 
 
   # SSH 服务设置

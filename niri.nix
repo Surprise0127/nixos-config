@@ -17,7 +17,7 @@
   };
 
   # Home Manager 用户级 Niri 配置：登录后自动拉起 Noctalia
-  home-manager.users.drfoobar = {
+  home-manager.users.kd = {
     home.stateVersion = "25.11";
 
     # 导入官方模块：Noctalia HM + niri-flake HM config
