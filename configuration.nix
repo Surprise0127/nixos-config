@@ -16,6 +16,8 @@
   # EFI 引导设置
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
+  # 缩短引导菜单等待时间，减少开机到会话的可感知延迟
+  boot.loader.timeout = 1;
   
   # 主机名
   networking.hostName = "nixos"; # 设置主机名
@@ -66,6 +68,8 @@
     fuzzel
     firefox
     vscode
+    # niri 官方文档中的 Xwayland 相关组件，避免会话启动时查找失败
+    xwayland-satellite
     qt6Packages.fcitx5-configtool
   ];
 
