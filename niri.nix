@@ -12,7 +12,7 @@
 
   # 启用 Niri（Wayland 合成器）
   programs.niri.enable = true;
-  programs.niri.useNautilus = false; # 用 GTK 文件选择器，避免强依赖 Nautilus
+  programs.niri.useNautilus = true; # 使用 Nautilus 作为文件选择器
 
   # 使用 greetd 作为登录管理器，并启动 Niri 会话
   services.greetd = {

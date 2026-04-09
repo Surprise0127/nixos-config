@@ -3,6 +3,7 @@
   # install package
   environment.systemPackages = with pkgs; [
     inputs.noctalia.packages.${pkgs.stdenv.hostPlatform.system}.default
+    nautilus
     # ... maybe other stuff
   ];
 }
