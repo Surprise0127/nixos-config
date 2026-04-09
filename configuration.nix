@@ -68,6 +68,7 @@
     fuzzel
     firefox
     vscode
+    v2rayn
     # niri 官方文档中的 Xwayland 相关组件，避免会话启动时查找失败
     xwayland-satellite
     qt6Packages.fcitx5-configtool
