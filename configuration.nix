@@ -72,7 +72,53 @@
     # niri 官方文档中的 Xwayland 相关组件，避免会话启动时查找失败
     xwayland-satellite
     qt6Packages.fcitx5-configtool
+    # 一键以独显方式启动 Firefox（Wayland + PRIME offload）
+    (writeShellScriptBin "firefox-dgpu" ''
+      set -euo pipefail
+
+      nvidia_render=""
+      for node in /sys/class/drm/renderD*; do
+        if [ -r "$node/device/vendor" ] && [ "$(cat "$node/device/vendor")" = "0x10de" ]; then
+          nvidia_render="$(basename "$node")"
+          break
+        fi
+      done
+
+      if [ -z "$nvidia_render" ]; then
+        echo "No NVIDIA render node found under /sys/class/drm" >&2
+        exit 1
+      fi
+
+      exec env \
+        MOZ_ENABLE_WAYLAND=1 \
+        MOZ_DRM_DEVICE="/dev/dri/$nvidia_render" \
+        nvidia-offload firefox --no-remote --new-instance "$@"
+    '')
+    (makeDesktopItem {
+      name = "firefox-dgpu";
+      desktopName = "Firefox (dGPU)";
+      genericName = "Web Browser";
+      comment = "Launch Firefox on NVIDIA dGPU";
+      exec = "firefox-dgpu %u";
+      icon = "firefox";
+      categories = [ "Network" "WebBrowser" ];
+      terminal = false;
+      startupNotify = true;
+    })
   ];
+
+  # 开机启用 NVIDIA 持久模式，减少图形应用首次调用独显时的切换延迟
+  systemd.services.nvidia-persistence-mode = {
+    description = "Enable NVIDIA persistence mode";
+    wantedBy = [ "multi-user.target" ];
+    after = [ "systemd-modules-load.service" ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      ExecStart = "${config.hardware.nvidia.package}/bin/nvidia-smi -pm 1";
+      ExecStop = "${config.hardware.nvidia.package}/bin/nvidia-smi -pm 0";
+    };
+  };
 
 
   # SSH 服务设置
